@@ -116,6 +116,10 @@ CLASS ltc_airline_capacity_tests IMPLEMENTATION.
 
 ENDCLASS.
 
+SELECTION-SCREEN BEGIN OF BLOCK sel1 WITH FRAME TITLE TEXT-001.
+PARAMETERS: p_carrid TYPE s_carr_id OBLIGATORY LOWER CASE.
+SELECTION-SCREEN END OF BLOCK sel1.
+
 *********************************************************************************************
 * Execute Code
 *********************************************************************************************
@@ -128,9 +132,9 @@ START-OF-SELECTION.
 
   CREATE OBJECT o_airline_capacity.
 
-  available_capacity = o_airline_capacity->get_available_capacity( 'AA' ).
-  used_capacity = o_airline_capacity->get_used_capacity( 'AA' ).
-  total_capacity = o_airline_capacity->get_total_capacity( 'AA' ).
+  available_capacity = o_airline_capacity->get_available_capacity( p_carrid ).
+  used_capacity = o_airline_capacity->get_used_capacity( p_carrid ).
+  total_capacity = o_airline_capacity->get_total_capacity( p_carrid ).
 
   WRITE: / 'The available capacity for airline AA is:', available_capacity.
   WRITE: / 'The used capacity for airline AA is:     ', used_capacity.

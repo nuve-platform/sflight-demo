@@ -85,7 +85,7 @@ ENDCLASS.
 *********************************************************************************************
 * Test double
 *********************************************************************************************
-CLASS zcl_airline_capacity_td DEFINITION INHERITING FROM zcl_airline_capacity.
+CLASS zcl_airline_capacity_td DEFINITION INHERITING FROM zcl_airline_capacity FOR TESTING RISK LEVEL HARMLESS DURATION SHORT.
   PUBLIC SECTION.
     METHODS zif_airline_capacity~get_data REDEFINITION.
 
@@ -189,7 +189,7 @@ CLASS ltc_airline_capacity_tests IMPLEMENTATION.
 ENDCLASS.
 
 *********************************************************************************************
-* Execute dode
+* Execute code
 *********************************************************************************************
 START-OF-SELECTION.
 

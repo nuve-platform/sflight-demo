@@ -6,7 +6,7 @@ on:
 
 jobs:
   sap-task:
-    runs-on: [self-hosted, prod]
+    runs-on: [ "self-hosted", "prod" ]
 
     env:
       # GitHub-related variables

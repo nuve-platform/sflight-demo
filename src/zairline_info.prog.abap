@@ -83,36 +83,62 @@ CLASS zcl_airline_capacity IMPLEMENTATION.
 ENDCLASS.
 
 *********************************************************************************************
-* Test Class
+* Test double
+*********************************************************************************************
+CLASS zcl_airline_capacity_td DEFINITION INHERITING FROM zcl_airline_capacity FOR TESTING RISK LEVEL HARMLESS DURATION SHORT.
+  PUBLIC SECTION.
+    METHODS zif_airline_capacity~get_data REDEFINITION.
+
+ENDCLASS.
+
+CLASS zcl_airline_capacity_td IMPLEMENTATION.
+  METHOD zif_airline_capacity~get_data.
+    ls_sflight_data = VALUE #( mandt = 800 carrid = 'AA' connid = 2402 fldate = '20230601' price = 300 currency = 'USD'
+                               planetype = '747-400' seatsmax = 400 seatsocc = 200 paymentsum = 30000 seatsmax_b = 80 seatsocc_b = 40
+                               seatsmax_f = 70 seatsocc_f = 35 ).
+    INSERT ls_sflight_data INTO TABLE lt_sflight_data.
+
+    ls_sflight_data = VALUE #( mandt = 800 carrid = 'AA' connid = 2401 fldate = '20230602' price = 250 currency = 'USD'
+                               planetype = '747-400' seatsmax = 400 seatsocc = 150 paymentsum = 25000 seatsmax_b = 80 seatsocc_b = 30
+                               seatsmax_f = 70 seatsocc_f = 30 ).
+    INSERT ls_sflight_data INTO TABLE lt_sflight_data.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+*********************************************************************************************
+* Unit tests
 *********************************************************************************************
 CLASS ltc_airline_capacity_tests DEFINITION FOR TESTING RISK LEVEL HARMLESS DURATION SHORT.
   PRIVATE SECTION.
-    DATA: lo_airline_capacity TYPE REF TO zcl_airline_capacity.
+    DATA: mo_airline_capacity TYPE REF TO zcl_airline_capacity_td.
 
     METHODS:
       setup,
-      test_get_available_capacity FOR TESTING,
-      test_get_used_capacity FOR TESTING,
       test_get_total_capacity FOR TESTING,
+      test_get_used_capacity FOR TESTING,
+      test_get_available_capacity FOR TESTING,
       test_capacity_relationship FOR TESTING.
 
 ENDCLASS.
 
 CLASS ltc_airline_capacity_tests IMPLEMENTATION.
   METHOD setup.
-    CREATE OBJECT lo_airline_capacity.
-    lo_airline_capacity->zif_airline_capacity~get_data( 'AA' ).
+    CREATE OBJECT mo_airline_capacity TYPE zcl_airline_capacity_td.
+    mo_airline_capacity->zif_airline_capacity~get_data( 'AA' ).
 
   ENDMETHOD.
 
-  METHOD test_get_available_capacity.
-    DATA: lv_available_capacity TYPE i.
+  METHOD test_get_total_capacity.
+    DATA: lv_total_capacity TYPE i.
 
-    lv_available_capacity = lo_airline_capacity->zif_airline_capacity~get_available_capacity( ).
+    lv_total_capacity = mo_airline_capacity->zif_airline_capacity~get_total_capacity( ).
 
-    cl_abap_unit_assert=>assert_not_initial(
-      act = lv_available_capacity
-      msg = 'Available capacity for the airline should not be initial'
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_total_capacity
+      exp = 1100
+      msg = 'Total capacity is not correct'
     ).
 
   ENDMETHOD.
@@ -120,23 +146,25 @@ CLASS ltc_airline_capacity_tests IMPLEMENTATION.
   METHOD test_get_used_capacity.
     DATA: lv_used_capacity TYPE i.
 
-    lv_used_capacity = lo_airline_capacity->zif_airline_capacity~get_used_capacity( ).
+    lv_used_capacity = mo_airline_capacity->zif_airline_capacity~get_used_capacity( ).
 
-    cl_abap_unit_assert=>assert_not_initial(
+    cl_abap_unit_assert=>assert_equals(
       act = lv_used_capacity
-      msg = 'Used capacity for the airline should not be initial'
+      exp = 485
+      msg = 'Used capacity is not correct'
     ).
 
   ENDMETHOD.
 
-  METHOD test_get_total_capacity.
-    DATA: lv_total_capacity TYPE i.
+  METHOD test_get_available_capacity.
+    DATA: lv_available_capacity TYPE i.
 
-    lv_total_capacity = lo_airline_capacity->zif_airline_capacity~get_total_capacity( ).
+    lv_available_capacity = mo_airline_capacity->zif_airline_capacity~get_available_capacity( ).
 
-    cl_abap_unit_assert=>assert_not_initial(
-      act = lv_total_capacity
-      msg = 'Total capacity for the airline should not be initial'
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_available_capacity
+      exp = 615
+      msg = 'Available capacity is not correct'
     ).
 
   ENDMETHOD.
@@ -146,9 +174,9 @@ CLASS ltc_airline_capacity_tests IMPLEMENTATION.
           lv_available_capacity TYPE i,
           lv_used_capacity      TYPE i.
 
-    lv_total_capacity = lo_airline_capacity->zif_airline_capacity~get_total_capacity( ).
-    lv_available_capacity = lo_airline_capacity->zif_airline_capacity~get_available_capacity( ).
-    lv_used_capacity = lo_airline_capacity->zif_airline_capacity~get_used_capacity( ).
+    lv_total_capacity = mo_airline_capacity->zif_airline_capacity~get_total_capacity( ).
+    lv_used_capacity = mo_airline_capacity->zif_airline_capacity~get_used_capacity( ).
+    lv_available_capacity = mo_airline_capacity->zif_airline_capacity~get_available_capacity( ).
 
     cl_abap_unit_assert=>assert_equals(
       act = lv_total_capacity
@@ -161,7 +189,7 @@ CLASS ltc_airline_capacity_tests IMPLEMENTATION.
 ENDCLASS.
 
 *********************************************************************************************
-* Execute dode
+* Execute code
 *********************************************************************************************
 START-OF-SELECTION.
 
